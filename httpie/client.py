@@ -67,8 +67,21 @@ def get_response(args, config_dir):
         kwargs = get_requests_kwargs(args)
         if args.debug:
             dump_request(kwargs)
+
+        # We want use %20 instead of plus sign for space symbol in URL,
+        # so we have to encode params ourselfs just before passing them to Requests
+        # It's dirty but it works for API Gateway
+        import urllib.parse
+        kwargs['params'] = urllib.parse.urlencode(kwargs['params'], quote_via=urllib.parse.quote)
+
         response = requests_session.request(**kwargs)
     else:
+        # We want use %20 instead of plus sign for space symbol in URL,
+        # so we have to encode params ourselfs just before passing them to Requests
+        # It's dirty but it works for API Gateway
+        import urllib.parse
+        args.params = urllib.parse.urlencode(args.params, quote_via=urllib.parse.quote)
+
         response = sessions.get_response(
             requests_session=requests_session,
             args=args,
